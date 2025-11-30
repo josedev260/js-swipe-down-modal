@@ -1,6 +1,6 @@
 {
   "name": "js-swipe-down-modal",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A highly customizable swipe-down modal component for React Native, built with react-native-gesture-handler and react-native-reanimated.",
   "main": "lib/SwipeDownModal.js",
   "files": [
