@@ -1,0 +1,35 @@
+{
+  "name": "js-swipe-down-modal",
+  "version": "1.0.3",
+  "description": "A highly customizable swipe-down modal component for React Native, built with react-native-gesture-handler and react-native-reanimated.",
+  "main": "lib/SwipeDownModal.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "babel src --out-dir lib --copy-files",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.70.0",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0"
+  },
+  "keywords": [
+    "react-native",
+    "modal",
+    "swipe",
+    "gesture",
+    "reanimated",
+    "component"
+  ],
+  "author": "Joseph Kyondera",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.28.5",
+    "metro-react-native-babel-preset": "^0.76.5"
+  }
+}
