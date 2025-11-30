@@ -106,7 +106,7 @@ You can wrap your custom content inside `children` and style it as needed.
 
 ## Author
 
-**Joseph Kyondera** – [GitHub](https://github.com/nzoyi) | [Website](https://galacticbytestudio.com)
+**Joseph Kyondera** – [GitHub](https://github.com/josedev260/js-swipe-down-modal) | [Website](https://galacticbytestudio.com)
 
 ---
 
