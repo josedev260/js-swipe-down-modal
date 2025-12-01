@@ -1,9 +1,11 @@
 import React from "react";
 import {
   Dimensions,
+  Keyboard,
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   View,
 } from "react-native";
@@ -24,6 +26,8 @@ const ScreenHeight = Dimensions.get("window").height;
 
 const SwipeDownModal = ({ visible, onClose, bgColor = "#fff", children }) => {
   const translateY = useSharedValue(500);
+  const keyboardHeight = useSharedValue(0);
+  const scrollY = useSharedValue(0);
 
   React.useEffect(() => {
     if (visible) {
@@ -31,13 +35,34 @@ const SwipeDownModal = ({ visible, onClose, bgColor = "#fff", children }) => {
     }
   }, [visible]);
 
+  React.useEffect(() => {
+    const show = Keyboard.addListener("keyboardWillShow", (e) => {
+      keyboardHeight.value = withTiming(e.endCoordinates.height, {
+        duration: 250,
+      });
+    });
+
+    const hide = Keyboard.addListener("keyboardWillHide", () => {
+      keyboardHeight.value = withTiming(0, { duration: 250 }, () => {
+        translateY.value = withSpring(0, { damping: 15 });
+      });
+    });
+
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
   const pan = Gesture.Pan()
     .onUpdate((event) => {
-      if (event.translationY > 0) {
+      "worklet";
+      if (scrollY.value <= 0 && event.translationY > 0) {
         translateY.value = event.translationY;
       }
     })
     .onEnd(() => {
+      "worklet";
       if (translateY.value > 160) {
         translateY.value = withTiming(500, { duration: 200 }, () => {
           runOnJS(onClose)();
@@ -47,9 +72,18 @@ const SwipeDownModal = ({ visible, onClose, bgColor = "#fff", children }) => {
       }
     });
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-  }));
+  const scrollGesture = Gesture.Native();
+
+  const sheetGesture = Gesture.Simultaneous(pan, scrollGesture);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const maxUp = -keyboardHeight.value;
+    const y = translateY.value;
+
+    return {
+      transform: [{ translateY: y < maxUp ? maxUp : y }],
+    };
+  });
 
   return (
     <Modal
@@ -61,12 +95,22 @@ const SwipeDownModal = ({ visible, onClose, bgColor = "#fff", children }) => {
       <Pressable style={styles.backdrop} onPress={onClose} />
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <GestureDetector gesture={pan}>
+        <GestureDetector gesture={sheetGesture}>
           <Animated.View
             style={[styles.modal, animatedStyle, { backgroundColor: bgColor }]}
           >
             <View style={styles.handle} />
-            {children}
+
+            <ScrollView
+              onScroll={(e) => {
+                scrollY.value = e.nativeEvent.contentOffset.y;
+              }}
+              scrollEventThrottle={16}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
+              {children}
+            </ScrollView>
           </Animated.View>
         </GestureDetector>
       </GestureHandlerRootView>
@@ -84,11 +128,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     width: "100%",
-    maxHeight: ScreenHeight * 0.8,
+    maxHeight: ScreenHeight * 0.85,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingTop: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     paddingBottom: Platform.OS === "ios" ? 30 : 20,
     shadowColor: "#000",
     shadowOpacity: 0.15,
